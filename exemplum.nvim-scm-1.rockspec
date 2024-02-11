@@ -4,7 +4,7 @@ package = "exemplum.nvim"
 version = MAJOR .. REV
 
 description = {
-  summary = "Take your functions and easily refactor them while keeping an eye at the initial implementation",
+  summary = "Take your functions and easily refactor them while keeping an eye on the initial implementation",
   labels = { "neovim", "refactoring" },
   homepage = "https://github.com/NTBBloodbath/exemplum.nvim",
   license = "GPLv3",
