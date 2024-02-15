@@ -12,6 +12,7 @@ description = {
 
 dependencies = {
   "lua >= 5.1, < 5.4",
+  "logging.nvim >= 1.0.0",
 }
 
 source = {
