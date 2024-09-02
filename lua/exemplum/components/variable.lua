@@ -73,10 +73,12 @@ local function refactor_variable()
       group = "Exemplum",
       pattern = "exemplum_variable_refactor",
       callback = function(ctx)
-        -- Get the refactor buffer contents and replace the code in the original buffer if it is different from the original code
-        local refactor_code = vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false)
-        if table.concat(refactor_code, "\n") ~= refactor_register then
-          vim.api.nvim_buf_set_text(code_bufnr, variable_range[1], variable_range[2], variable_range[3], variable_range[4], refactor_code)
+        if ctx.event == "BufWriteCmd" then
+          -- Get the refactor buffer contents and replace the code in the original buffer if it is different from the original code
+          local refactor_code = vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false)
+          if table.concat(refactor_code, "\n") ~= refactor_register then
+            vim.api.nvim_buf_set_text(code_bufnr, variable_range[1], variable_range[2], variable_range[3], variable_range[4], refactor_code)
+          end
         end
 
         -- Disable the modified status while quitting to avoid the save prompts
