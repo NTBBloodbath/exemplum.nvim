@@ -76,6 +76,9 @@ local function refactor_function()
           vim.api.nvim_buf_set_text(code_bufnr, function_range[1], function_range[2], function_range[3], function_range[4], refactor_code)
         end
 
+        -- Disable the modified status while quitting to avoid the save prompts
+        vim.api.nvim_set_option_value("modified", false, { buf = ref_bufnr })
+
         -- Deletes the buffer
         if vim.api.nvim_buf_is_loaded(ctx.buf) then
           vim.cmd.bdelete(ctx.buf)
