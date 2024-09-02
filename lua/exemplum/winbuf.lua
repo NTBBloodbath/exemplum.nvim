@@ -17,7 +17,7 @@ function winbuf.open_split(buf_name, filetype)
   -- Get the buffer number and window ID for the newly created split, as the focus is automatically switched to it
   local ref_bufnr = vim.api.nvim_create_buf(false, true)
   local ref_winid = vim.api.nvim_open_win(ref_bufnr, false, {
-    split = "left",
+    split = "right",
     win = 0,
   })
 
@@ -28,6 +28,9 @@ function winbuf.open_split(buf_name, filetype)
   vim.api.nvim_set_option_value("bufhidden", "hide", { buf = ref_bufnr })
   vim.api.nvim_set_option_value("buflisted", false, { buf = ref_bufnr })
   vim.api.nvim_set_option_value("signcolumn", "no", { win = ref_winid })
+
+  -- Set focus
+  vim.api.nvim_set_current_win(ref_winid)
 
   return ref_bufnr
 end
