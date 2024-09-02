@@ -1,20 +1,21 @@
 name: Release Please Automatic Semver
 
-on:
-  push:
-    branches:
-      - main
-
 permissions:
   contents: write
   pull-requests: write
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
   release:
     name: release
     runs-on: ubuntu-latest
     steps:
-      - uses: google-github-actions/release-please-action@v3
+      - uses: googleapis/release-please-action@v4
         with:
           release-type: simple
-          package-name: exemplum.nvim
+          token: ${{ secrets.CI_TOKEN }}

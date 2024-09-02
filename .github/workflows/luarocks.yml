@@ -2,11 +2,11 @@ name: Luarocks release
 
 on:
   push:
+    tags:
+      - "*"
     release:
       types:
         - created
-    tags:
-      - "*"
   workflow_dispatch:
 
 jobs:
@@ -22,3 +22,14 @@ jobs:
         uses: mrcjkb/luarocks-tag-release@v5
         env:
           LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
+        with:
+          dependencies: |
+            logging.nvim >= 1.1.0
+          labels: |
+            neovim
+            tree-sitter
+            refactoring-tools
+          detailed_description: |
+            Seamlessly refactor code chunks within your projects while keeping an eye on the initial
+            implementation. By providing an intuitive interface, it simplifies the process of
+            modifying functions, variables, and other code elements without disrupting your workflow.
