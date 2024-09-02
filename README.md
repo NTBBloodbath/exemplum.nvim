@@ -72,6 +72,7 @@ Currently available `code_type` arguments:
 
 - `Lua`
 - `Rust`
+- `Python`
 
 ## License
 

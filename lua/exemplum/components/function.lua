@@ -8,6 +8,7 @@ local winbuf = require("exemplum.winbuf")
 local function_node_names = {
   lua = "function_declaration",
   rust = "function_item",
+  python = "function_definition",
 }
 
 ---Retrieves the function chunk under the cursor in the current buffer.

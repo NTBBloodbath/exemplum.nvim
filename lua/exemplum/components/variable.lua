@@ -8,6 +8,7 @@ local winbuf = require("exemplum.winbuf")
 local variable_node_names = {
   lua = "variable_declaration",
   rust = "let_declaration",
+  python = "assignment",
 }
 
 ---Retrieves the variable chunk under the cursor in the current buffer.
