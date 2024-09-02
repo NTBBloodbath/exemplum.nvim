@@ -3,6 +3,8 @@ Seamlessly refactor code chunks within your projects while keeping an eye on the
 implementation. By providing an intuitive interface, it simplifies the process of modifying
 functions, variables, and other code elements without disrupting your workflow.
 
+![exemplum demo](https://github.com/user-attachments/assets/b6a2c395-a6ce-4a6b-9990-43ac4db05d0e)
+
 > [!IMPORTANT]
 >
 > 1. The plugin is in early development, so it may not work with certain languages. If your
