@@ -91,6 +91,7 @@ will be applied or you can close the buffer using `:q` to close it without apply
 
 ### Supported languages
 
+- `C++`
 - `Lua`
 - `Rust`
 - `Python`
