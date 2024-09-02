@@ -49,7 +49,25 @@ require("lazy").setup({
 > If you are going for lazy-loading, it would be recommended to load by `filetype`. Below you can
 > find the languages that are currently supported.
 
+### Configuration
+
+`exemplum.nvim` is configured through the `vim.g.exemplum` global variable. The following is the
+default configuration:
+
+```lua
+---@type ExemplumConfig
+vim.g.exemplum = {
+  window_style = "split",
+  window_border = "single",
+}
+```
+
+The configuration is annotated, so you should have a good experience editing it.
+
 ## Usage
+
+`exemplum.nvim` does not require a `setup` function to work and automatically creates the `:Exemplum`
+command when loaded.
 
 - **Refactor nearest code chunk**: use `:Exemplum` command to refactor the nearest code chunk under
   your cursor position.
@@ -60,6 +78,9 @@ require("lazy").setup({
 Currently available `code_type` arguments:
 - `function`
 - `variable`
+
+After performing a refactoring you can either save the buffer so it will be closed and the changes
+will be applied or you can close the buffer using `:q` to close it without applying the changes.
 
 > [!NOTE]
 >
