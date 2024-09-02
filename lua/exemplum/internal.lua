@@ -14,8 +14,9 @@ local function set_up_command()
 
     -- TODO: infer node to refactor based on the current cursor position
     if #fargs < 1 then
-      vim.g.exemplum.logger:warn("The inference method is under development and may be inaccurate at times."
-        .. " If you need precision in refactoring rather than quick editing, use arguments in the command invocation.")
+      vim.notify_once("exemplum.nvim WARN: The inference method is under development and may be inaccurate at times."
+        .. " If you need precision in refactoring rather than quick editing, use arguments in the command invocation.",
+        vim.log.levels.WARN)
       require("exemplum.components.infer").try_refactor()
     else
       local code_type = fargs[1]
