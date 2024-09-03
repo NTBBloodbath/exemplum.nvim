@@ -21,7 +21,7 @@ local function get_node_chunk(bufnr, filetype)
 
   -- Early return if the filetype is not yet supported
   if not function_node_name then
-    error("The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim")
+    vim.g.exemplum.logger:error("The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim")
   end
 
   -- Get the node at the current cursor position
