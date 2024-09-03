@@ -139,7 +139,7 @@ local function refactor_enum()
         end
 
         -- Disable the modified status while quitting to avoid the save prompts
-        vim.api.nvim_set_option_value("modified", false, { buf = ref_bufnr })
+        vim.api.nvim_set_option_value("modified", false, { buf = ctx.buf })
 
         -- Deletes the buffer
         if vim.api.nvim_buf_is_loaded(ctx.buf) then
