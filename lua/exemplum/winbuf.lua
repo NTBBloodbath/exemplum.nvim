@@ -42,7 +42,7 @@ function winbuf.open_float(buf_name, filetype)
   local ref_winid = vim.api.nvim_open_win(ref_bufnr, false, {
     title = (" " .. buf_name:gsub("_", " ")):gsub("%W%l", string.upper):sub(2),
     title_pos = "center",
-    border = vim.g.exemplum.window_border,
+    border = vim.g.exemplum.window.border,
     style = "minimal",
     relative = "win",
     anchor = vim.api.nvim_win_get_position(current_window)[0] ~= 0 and "NE" or "SE",

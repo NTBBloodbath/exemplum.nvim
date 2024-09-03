@@ -78,9 +78,9 @@ local function refactor_variable(bang)
 
   ---@type number
   local ref_bufnr
-  if vim.g.exemplum.window_style == "split" then
+  if vim.g.exemplum.window.style == "split" then
     ref_bufnr = winbuf.open_split("exemplum_variable_refactor", buf_filetype)
-  elseif vim.g.exemplum.window_style == "float" then
+  elseif vim.g.exemplum.window.style == "float" then
     ref_bufnr = winbuf.open_float("exemplum_variable_refactor", buf_filetype)
   end
   -- Whether to disable diagnostics in the refactoring buffer
