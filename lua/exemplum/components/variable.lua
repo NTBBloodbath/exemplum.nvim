@@ -25,6 +25,7 @@ local function get_variable_chunk(bufnr, filetype)
   -- Early return if the filetype is not yet supported
   if not variable_node_name then
     vim.g.exemplum.logger:error("The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim")
+    return {}
   end
 
   -- Get the node at the current cursor position
@@ -37,9 +38,20 @@ local function get_variable_chunk(bufnr, filetype)
     variable_chunk = vim.treesitter.get_node_text(current_node, bufnr)
   else
     repeat
-      current_node = current_node:parent()
+      if current_node ~= nil then
+        current_node = current_node:parent()
+      else
+        break
+      end
       ---@cast current_node -nil
-    until current_node:type() == variable_node_name
+    until current_node ~= nil and current_node:type() == variable_node_name
+
+    -- Early return if a variable node could not be found
+    if not current_node then
+      vim.g.exemplum.logger:error("Could not find a variable in the current scope: probably your cursor is placed in the wrong scope?")
+      return {}
+    end
+
     ---@cast current_node -nil
     variable_chunk = vim.treesitter.get_node_text(current_node, bufnr)
   end
@@ -54,6 +66,11 @@ local function refactor_variable()
 
   -- Get the variable node and save the variable code into the `e` register
   local variable_range = get_variable_chunk(code_bufnr, buf_filetype)
+
+  if #variable_range == 0 then
+    return {}
+  end
+
   local refactor_register = vim.fn.getreg("e")
 
   ---@type number
@@ -91,6 +108,8 @@ local function refactor_variable()
       end
     })
   end
+
+  return variable_range
 end
 
 return {

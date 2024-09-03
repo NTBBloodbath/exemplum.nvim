@@ -96,6 +96,7 @@ local function get_struct_chunk(bufnr, filetype)
   -- Early return if the filetype is not yet supported
   if not struct_node_name then
     vim.g.exemplum.logger:error("The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim")
+    return {}
   end
 
   -- Get the node at the current cursor position
@@ -120,9 +121,20 @@ local function get_struct_chunk(bufnr, filetype)
     end
   else
     repeat
-      current_node = current_node:parent()
+      if current_node ~= nil then
+        current_node = current_node:parent()
+      else
+        break
+      end
       ---@cast current_node -nil
-    until current_node:type() == struct_node_name
+    until current_node ~= nil and current_node:type() == struct_node_name
+
+    -- Early return if a struct node could not be found
+    if not current_node then
+      vim.g.exemplum.logger:error("Could not find a struct in the current scope: probably your cursor is placed in the wrong scope?")
+      return {}
+    end
+
     if filetype == "python" then
       ---@cast current_node -nil
       struct_chunk = get_struct_class_python(bufnr, current_node)
@@ -154,7 +166,7 @@ local function refactor_struct()
 
   -- Early return if there was an error during the chunk retrieval process
   if #struct_range == 0 then
-    return
+    return {}
   end
 
   local refactor_register = vim.fn.getreg("e")
@@ -193,6 +205,8 @@ local function refactor_struct()
       end
     })
   end
+
+  return struct_range
 end
 
 return {

@@ -55,11 +55,13 @@ local function get_enum_chunk(bufnr, filetype)
   -- Early return if ran in Lua, because Lua does not have enums
   if filetype == "lua" then
     vim.g.exemplum.logger:error("Lua does not support Enums")
+    return {}
   end
 
   -- Early return if the filetype is not yet supported
   if not enum_node_name then
     vim.g.exemplum.logger:error("The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim")
+    return {}
   end
 
   -- Get the node at the current cursor position
@@ -80,9 +82,20 @@ local function get_enum_chunk(bufnr, filetype)
     end
   else
     repeat
-      current_node = current_node:parent()
+      if current_node ~= nil then
+        current_node = current_node:parent()
+      else
+        break
+      end
       ---@cast current_node -nil
-    until current_node:type() == enum_node_name
+    until current_node ~= nil and current_node:type() == enum_node_name
+
+    -- Early return if an enum node could not be found
+    if not current_node then
+      vim.g.exemplum.logger:error("Could not find an enum in the current scope: probably your cursor is placed in the wrong scope?")
+      return {}
+    end
+
     if filetype == "python" then
       ---@cast current_node -nil
       enum_chunk = get_enum_inheritance_python(bufnr, current_node)
@@ -109,7 +122,7 @@ local function refactor_enum()
 
   -- Early return if there was an error during the chunk retrieval process
   if #enum_range == 0 then
-    return
+    return {}
   end
 
   local refactor_register = vim.fn.getreg("e")
@@ -148,6 +161,8 @@ local function refactor_enum()
       end
     })
   end
+
+  return enum_range
 end
 
 return {

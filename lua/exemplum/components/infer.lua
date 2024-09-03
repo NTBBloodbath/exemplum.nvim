@@ -22,6 +22,7 @@ local function get_node_chunk(bufnr, filetype)
   -- Early return if the filetype is not yet supported
   if not function_node_name then
     vim.g.exemplum.logger:error("The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim")
+    return {}
   end
 
   -- Get the node at the current cursor position
@@ -68,14 +69,14 @@ local function get_node_chunk(bufnr, filetype)
     current_node = current_node:parent()
   end
 
-  if node_chunk then
-    vim.fn.setreg("e", node_chunk)
-    ---@cast current_node -nil
-    return { vim.treesitter.get_node_range(current_node) }
+  if not node_chunk then
+    vim.g.exemplum.logger:error("Failed to find a code chunk to refactor: probably your cursor is placed in the wrong scope?")
+    return {}
   end
 
-  vim.g.exemplum.logger:error("Failed to find a code chunk to refactor: probably your cursor is placed in the wrong scope?")
-  return {}
+  vim.fn.setreg("e", node_chunk)
+  ---@cast current_node -nil
+  return { vim.treesitter.get_node_range(current_node) }
 end
 
 local function try_refactor()
@@ -87,7 +88,7 @@ local function try_refactor()
 
   -- Early return if there was an error during the chunk retrieval process
   if #node_range == 0 then
-    return
+    return {}
   end
 
   ---@type number
@@ -125,6 +126,8 @@ local function try_refactor()
       end
     })
   end
+
+  return node_range
 end
 
 return { try_refactor = try_refactor }
