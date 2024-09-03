@@ -60,13 +60,16 @@ local function get_variable_chunk(bufnr, filetype)
   return { vim.treesitter.get_node_range(current_node) }
 end
 
-local function refactor_variable()
+---Refactor a variable at the cursor position
+---@param bang boolean Whether the `:Exemplum` command ran with bang (`!`)
+local function refactor_variable(bang)
   local code_bufnr = vim.api.nvim_win_get_buf(0)
   local buf_filetype = vim.api.nvim_get_option_value("filetype", { buf = code_bufnr })
 
   -- Get the variable node and save the variable code into the `e` register
   local variable_range = get_variable_chunk(code_bufnr, buf_filetype)
 
+  -- Early return if there was an error during the chunk retrieval process
   if #variable_range == 0 then
     return {}
   end
@@ -80,7 +83,10 @@ local function refactor_variable()
   elseif vim.g.exemplum.window_style == "float" then
     ref_bufnr = winbuf.open_float("exemplum_variable_refactor", buf_filetype)
   end
-
+  -- Whether to disable diagnostics in the refactoring buffer
+  if bang or vim.g.exemplum.disable_diagnostics then
+    vim.diagnostic.enable(false, { bufnr = ref_bufnr })
+  end
   -- Set the refactor buffer contents
   vim.api.nvim_buf_set_lines(ref_bufnr, 0, -1, false, vim.split(vim.fn.getreg("e"), "\n"))
 

@@ -16,17 +16,18 @@ local function set_up_command()
       vim.notify_once("exemplum.nvim WARN: The inference method is under development and may be inaccurate at times."
         .. " If you need precision in refactoring rather than quick editing, use arguments in the command invocation.",
         vim.log.levels.WARN)
-      require("exemplum.components.infer").try_refactor()
+      require("exemplum.components.infer").try_refactor(ctx.bang)
     else
       local code_type = fargs[1]
       if vim.iter({ "function", "variable", "struct", "enum" }):find(code_type) then
-        require("exemplum.components." .. code_type).refactor()
+        require("exemplum.components." .. code_type).refactor(ctx.bang)
       else
         vim.g.exemplum.logger:error("Unknown code type to refactor: maybe not supported yet?")
       end
     end
   end, {
     desc = "Run exemplum.nvim",
+    bang = true,
     nargs = "?",
     complete = function(arg_lead, cmdline, _)
       local valid_arguments = { "function", "variable", "struct", "enum" }

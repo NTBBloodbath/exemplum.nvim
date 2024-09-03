@@ -60,7 +60,9 @@ local function get_function_chunk(bufnr, filetype)
   return { vim.treesitter.get_node_range(current_node) }
 end
 
-local function refactor_function()
+---Refactor a function at the cursor position
+---@param bang boolean Whether the `:Exemplum` command ran with bang (`!`)
+local function refactor_function(bang)
   local code_bufnr = vim.api.nvim_win_get_buf(0)
   local buf_filetype = vim.api.nvim_get_option_value("filetype", { buf = code_bufnr })
 
@@ -80,6 +82,10 @@ local function refactor_function()
     ref_bufnr = winbuf.open_split("exemplum_function_refactor", buf_filetype)
   elseif vim.g.exemplum.window_style == "float" then
     ref_bufnr = winbuf.open_float("exemplum_function_refactor", buf_filetype)
+  end
+  -- Whether to disable diagnostics in the refactoring buffer
+  if bang or vim.g.exemplum.disable_diagnostics then
+    vim.diagnostic.enable(false, { bufnr = ref_bufnr })
   end
   -- Set the refactor buffer contents
   vim.api.nvim_buf_set_lines(ref_bufnr, 0, -1, false, vim.split(vim.fn.getreg("e"), "\n"))
