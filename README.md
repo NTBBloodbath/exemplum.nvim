@@ -59,8 +59,11 @@ default configuration:
 ```lua
 ---@type ExemplumConfig
 vim.g.exemplum = {
-  window_style = "split",
-  window_border = "single",
+  window = {
+    style = "split",
+    border = "single",
+  },
+  disable_diagnostics = false,
 }
 ```
 
