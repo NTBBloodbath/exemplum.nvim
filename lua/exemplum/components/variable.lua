@@ -8,6 +8,7 @@ local winbuf = require("exemplum.winbuf")
 local variable_node_names = {
   c = "declaration",
   cpp = "declaration",
+  go = { "short_var_declaration", "var_declaration" },
   lua = "variable_declaration",
   rust = "let_declaration",
   python = "assignment",
@@ -35,7 +36,9 @@ local function get_variable_chunk(bufnr, filetype)
   local variable_chunk
 
   ---@cast current_node -nil
-  if current_node:type() == variable_node_name then
+  if
+    (type(variable_node_name) == "string" and current_node:type() == variable_node_name) or (type(variable_node_name) == "table" and vim.iter(variable_node_name):find(current_node:type()))
+  then
     variable_chunk = vim.treesitter.get_node_text(current_node, bufnr)
   else
     repeat
@@ -45,7 +48,7 @@ local function get_variable_chunk(bufnr, filetype)
         break
       end
       ---@cast current_node -nil
-    until current_node ~= nil and current_node:type() == variable_node_name
+    until current_node ~= nil and ((type(variable_node_name) == "string" and current_node:type() == variable_node_name) or (type(variable_node_name) == "table" and vim.iter(variable_node_name):find(current_node:type())))
 
     -- Early return if a variable node could not be found
     if not current_node then

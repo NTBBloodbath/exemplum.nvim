@@ -8,6 +8,7 @@ local winbuf = require("exemplum.winbuf")
 local function_node_names = {
   c = "function_definition",
   cpp = "function_definition",
+  go = "function_declaration",
   lua = "function_declaration",
   rust = "function_item",
   python = "function_definition",

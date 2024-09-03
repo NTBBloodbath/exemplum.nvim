@@ -8,9 +8,30 @@ local winbuf = require("exemplum.winbuf")
 local enum_node_names = {
   c = "enum_specifier",
   cpp = "enum_specifier",
+  go = "const_declaration", -- XXX: Go does not support enums but it has a weird voodoo workaround for it by using constants
   rust = "enum_item",
   python = "class_definition", -- XXX: in Python, Enum is another Class that is inherited
 }
+
+---Gets the constant chunk content if it has multiple named child nodes
+---@param bufnr number The buffer number
+---@param const_node TSNode The const node
+---@return string Const node contents, empty if there was an error
+local function get_enum_const_go(bufnr, const_node)
+  -- HACK: perhaps a simple `const YELLOW = 4` should be also allowed instead of enforcing the following?
+  --
+  -- const (
+  --     RED = 1
+  --     GREEN = 2
+  --     // ...
+  -- )
+  if const_node:named_child_count() < 2 then
+    vim.g.exemplum.logger:error("The const assignment in the current cursor position is not an enum assignment")
+    return ""
+  end
+
+  return vim.treesitter.get_node_text(const_node, bufnr)
+end
 
 ---Gets the class chunk content if it has an inheritance from the Enum class
 ---@param bufnr number The buffer number
@@ -76,6 +97,11 @@ local function get_enum_chunk(bufnr, filetype)
       enum_chunk = get_enum_inheritance_python(bufnr, current_node)
       if enum_chunk == "" then
         vim.g.exemplum.logger:error("No Enum inherited class was found")
+        return {}
+      end
+    elseif filetype == "go" then
+      enum_chunk = get_enum_const_go(bufnr, current_node)
+      if enum_chunk == "" then
         return {}
       end
     else

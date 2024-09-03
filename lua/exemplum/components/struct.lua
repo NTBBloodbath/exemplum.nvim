@@ -8,15 +8,49 @@ local winbuf = require("exemplum.winbuf")
 local struct_node_names = {
   c = "struct_specifier",
   cpp = "struct_specifier",
+  go = "struct_type",
   lua = "assignment_statement", -- XXX: in Lua, a table counts as a dynamic struct (table_constructor)
   rust = "struct_item",
   python = "class_definition", -- XXX: in Python, Structs are defined as a decorator in a Class node
 }
 
+---Gets the struct_type chunk content
+---@param bufnr number The buffer number
+---@param struct_node TSNode The struct node
+---@return string Struct node contents, empty if there was an error
+local function get_struct_type_go(bufnr, struct_node)
+  if struct_node:parent():type() == "ERROR" then
+    vim.g.exemplum.logger:error("Found invalid syntax for struct constructor")
+    return ""
+  end
+
+  -- Iterate until we reach a type_declaration node:
+  -- (type_declaration
+  --   (type_spec
+  --     name: (type_identifier)
+  --     type: (struct_type))) <- struct_node
+  repeat
+    if struct_node ~= nil then
+      ---@diagnostic disable-next-line cast-local-type
+      struct_node = struct_node:parent()
+    end
+    ---@cast struct_node -nil
+  until struct_node ~= nil and struct_node:type() == "type_declaration"
+
+  -- Early return if the struct_type node is not a child of a type_declaration node
+  if not struct_node then
+    vim.g.exemplum.logger:error("Could not find a struct that belongs to a type declaration at the cursor position")
+    return ""
+  end
+
+  ---@cast struct_node -nil
+  return vim.treesitter.get_node_text(struct_node, bufnr)
+end
+
 ---Gets the assignment_statement chunk content if it has a `table_constructor` node
 ---@param bufnr number The buffer number
 ---@param assignment_node TSNode The assignment node
----@return string Class node contents, empty if there was an error
+---@return string Table node contents, empty if there was an error
 local function get_struct_table_lua(bufnr, assignment_node)
   ---@type string
   local struct_chunk
@@ -107,7 +141,12 @@ local function get_struct_chunk(bufnr, filetype)
 
   ---@cast current_node -nil
   if current_node:type() == struct_node_name then
-    if filetype == "python" then
+    if filetype == "go" then
+      struct_chunk = get_struct_type_go(bufnr, current_node)
+      if struct_chunk == "" then
+        return {}
+      end
+    elseif filetype == "python" then
       struct_chunk = get_struct_class_python(bufnr, current_node)
       if struct_chunk == "" then
         return {}

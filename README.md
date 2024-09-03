@@ -100,6 +100,7 @@ will be applied or you can close the buffer using `:q` to close it without apply
 
 - `C`
 - `C++`
+- `Go`
 - `Lua` (does not support `enum`s)
 - `Rust`
 - `Python`
