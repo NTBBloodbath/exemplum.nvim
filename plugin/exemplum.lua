@@ -6,9 +6,7 @@ if vim.version().minor < 10 then
   return
 end
 
-if vim.g.loaded_exemplum then
-  return
-end
+if vim.g.loaded_exemplum then return end
 
 require("exemplum.internal").load()
 

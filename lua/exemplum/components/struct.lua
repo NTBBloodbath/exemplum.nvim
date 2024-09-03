@@ -34,12 +34,14 @@ local function get_struct_type_go(bufnr, struct_node)
       ---@diagnostic disable-next-line cast-local-type
       struct_node = struct_node:parent()
     end
-    ---@cast struct_node -nil
+  ---@cast struct_node -nil
   until struct_node ~= nil and struct_node:type() == "type_declaration"
 
   -- Early return if the struct_type node is not a child of a type_declaration node
   if not struct_node then
-    vim.g.exemplum.logger:error("Could not find a struct that belongs to a type declaration at the cursor position")
+    vim.g.exemplum.logger:error(
+      "Could not find a struct that belongs to a type declaration at the cursor position"
+    )
     return ""
   end
 
@@ -130,7 +132,9 @@ local function get_struct_chunk(bufnr, filetype)
 
   -- Early return if the filetype is not yet supported
   if not struct_node_name then
-    vim.g.exemplum.logger:error("The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim")
+    vim.g.exemplum.logger:error(
+      "The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim"
+    )
     return {}
   end
 
@@ -143,19 +147,13 @@ local function get_struct_chunk(bufnr, filetype)
   if current_node:type() == struct_node_name then
     if filetype == "go" then
       struct_chunk = get_struct_type_go(bufnr, current_node)
-      if struct_chunk == "" then
-        return {}
-      end
+      if struct_chunk == "" then return {} end
     elseif filetype == "python" then
       struct_chunk = get_struct_class_python(bufnr, current_node)
-      if struct_chunk == "" then
-        return {}
-      end
+      if struct_chunk == "" then return {} end
     elseif filetype == "lua" then
       struct_chunk = get_struct_table_lua(bufnr, current_node)
-      if struct_chunk == "" then
-        return {}
-      end
+      if struct_chunk == "" then return {} end
     else
       struct_chunk = vim.treesitter.get_node_text(current_node, bufnr)
     end
@@ -166,27 +164,25 @@ local function get_struct_chunk(bufnr, filetype)
       else
         break
       end
-      ---@cast current_node -nil
+    ---@cast current_node -nil
     until current_node ~= nil and current_node:type() == struct_node_name
 
     -- Early return if a struct node could not be found
     if not current_node then
-      vim.g.exemplum.logger:error("Could not find a struct in the current scope: probably your cursor is placed in the wrong scope?")
+      vim.g.exemplum.logger:error(
+        "Could not find a struct in the current scope: probably your cursor is placed in the wrong scope?"
+      )
       return {}
     end
 
     if filetype == "python" then
       ---@cast current_node -nil
       struct_chunk = get_struct_class_python(bufnr, current_node)
-      if struct_chunk == "" then
-        return {}
-      end
+      if struct_chunk == "" then return {} end
     elseif filetype == "lua" then
       ---@cast current_node -nil
       struct_chunk = get_struct_table_lua(bufnr, current_node)
-      if struct_chunk == "" then
-        return {}
-      end
+      if struct_chunk == "" then return {} end
     else
       ---@cast current_node -nil
       struct_chunk = vim.treesitter.get_node_text(current_node, bufnr)
@@ -207,9 +203,7 @@ local function refactor_struct(bang)
   local struct_range = get_struct_chunk(code_bufnr, buf_filetype)
 
   -- Early return if there was an error during the chunk retrieval process
-  if #struct_range == 0 then
-    return {}
-  end
+  if #struct_range == 0 then return {} end
 
   local refactor_register = vim.fn.getreg("e")
 
@@ -228,7 +222,9 @@ local function refactor_struct(bang)
   vim.api.nvim_buf_set_lines(ref_bufnr, 0, -1, false, vim.split(vim.fn.getreg("e"), "\n"))
 
   -- Avoid autocommands duplication
-  if #vim.api.nvim_get_autocmds({ group = "Exemplum", pattern = "exemplum_struct_refactor" }) < 1 then
+  if
+    #vim.api.nvim_get_autocmds({ group = "Exemplum", pattern = "exemplum_struct_refactor" }) < 1
+  then
     vim.api.nvim_create_autocmd({ "BufWriteCmd", "BufLeave" }, {
       group = "Exemplum",
       pattern = "exemplum_struct_refactor",
@@ -237,7 +233,14 @@ local function refactor_struct(bang)
           -- Get the refactor buffer contents and replace the code in the original buffer if it is different from the original code
           local refactor_code = vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false)
           if table.concat(refactor_code, "\n") ~= refactor_register then
-            vim.api.nvim_buf_set_text(code_bufnr, struct_range[1], struct_range[2], struct_range[3], struct_range[4], refactor_code)
+            vim.api.nvim_buf_set_text(
+              code_bufnr,
+              struct_range[1],
+              struct_range[2],
+              struct_range[3],
+              struct_range[4],
+              refactor_code
+            )
           end
         end
 
@@ -245,10 +248,8 @@ local function refactor_struct(bang)
         vim.api.nvim_set_option_value("modified", false, { buf = ctx.buf })
 
         -- Deletes the buffer
-        if vim.api.nvim_buf_is_loaded(ctx.buf) then
-          vim.cmd.bdelete(ctx.buf)
-        end
-      end
+        if vim.api.nvim_buf_is_loaded(ctx.buf) then vim.cmd.bdelete(ctx.buf) end
+      end,
     })
   end
 end

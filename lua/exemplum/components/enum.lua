@@ -26,7 +26,9 @@ local function get_enum_const_go(bufnr, const_node)
   --     // ...
   -- )
   if const_node:named_child_count() < 2 then
-    vim.g.exemplum.logger:error("The const assignment in the current cursor position is not an enum assignment")
+    vim.g.exemplum.logger:error(
+      "The const assignment in the current cursor position is not an enum assignment"
+    )
     return ""
   end
 
@@ -82,7 +84,9 @@ local function get_enum_chunk(bufnr, filetype)
 
   -- Early return if the filetype is not yet supported
   if not enum_node_name then
-    vim.g.exemplum.logger:error("The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim")
+    vim.g.exemplum.logger:error(
+      "The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim"
+    )
     return {}
   end
 
@@ -101,9 +105,7 @@ local function get_enum_chunk(bufnr, filetype)
       end
     elseif filetype == "go" then
       enum_chunk = get_enum_const_go(bufnr, current_node)
-      if enum_chunk == "" then
-        return {}
-      end
+      if enum_chunk == "" then return {} end
     else
       enum_chunk = vim.treesitter.get_node_text(current_node, bufnr)
     end
@@ -114,12 +116,14 @@ local function get_enum_chunk(bufnr, filetype)
       else
         break
       end
-      ---@cast current_node -nil
+    ---@cast current_node -nil
     until current_node ~= nil and current_node:type() == enum_node_name
 
     -- Early return if an enum node could not be found
     if not current_node then
-      vim.g.exemplum.logger:error("Could not find an enum in the current scope: probably your cursor is placed in the wrong scope?")
+      vim.g.exemplum.logger:error(
+        "Could not find an enum in the current scope: probably your cursor is placed in the wrong scope?"
+      )
       return {}
     end
 
@@ -150,9 +154,7 @@ local function refactor_enum(bang)
   local enum_range = get_enum_chunk(code_bufnr, buf_filetype)
 
   -- Early return if there was an error during the chunk retrieval process
-  if #enum_range == 0 then
-    return {}
-  end
+  if #enum_range == 0 then return {} end
 
   local refactor_register = vim.fn.getreg("e")
 
@@ -180,7 +182,14 @@ local function refactor_enum(bang)
           -- Get the refactor buffer contents and replace the code in the original buffer if it is different from the original code
           local refactor_code = vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false)
           if table.concat(refactor_code, "\n") ~= refactor_register then
-            vim.api.nvim_buf_set_text(code_bufnr, enum_range[1], enum_range[2], enum_range[3], enum_range[4], refactor_code)
+            vim.api.nvim_buf_set_text(
+              code_bufnr,
+              enum_range[1],
+              enum_range[2],
+              enum_range[3],
+              enum_range[4],
+              refactor_code
+            )
           end
         end
 
@@ -188,10 +197,8 @@ local function refactor_enum(bang)
         vim.api.nvim_set_option_value("modified", false, { buf = ctx.buf })
 
         -- Deletes the buffer
-        if vim.api.nvim_buf_is_loaded(ctx.buf) then
-          vim.cmd.bdelete(ctx.buf)
-        end
-      end
+        if vim.api.nvim_buf_is_loaded(ctx.buf) then vim.cmd.bdelete(ctx.buf) end
+      end,
     })
   end
 end

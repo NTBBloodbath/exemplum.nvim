@@ -21,7 +21,9 @@ local function get_node_chunk(bufnr, filetype)
 
   -- Early return if the filetype is not yet supported
   if not function_node_name then
-    vim.g.exemplum.logger:error("The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim")
+    vim.g.exemplum.logger:error(
+      "The filetype '" .. filetype .. "' isn't currently supported by exemplum.nvim"
+    )
     return {}
   end
 
@@ -34,9 +36,7 @@ local function get_node_chunk(bufnr, filetype)
   while true do
     -- If there's no parent for the current node then break
     -- because we hit the file root node
-    if not current_node then
-      break
-    end
+    if not current_node then break end
 
     -- Precedence order (in theory?):
     -- - variable
@@ -49,11 +49,11 @@ local function get_node_chunk(bufnr, filetype)
       break
     else
       if filetype == "python" and current_node:type() == struct_node_name then
-          node_chunk = struct.get_struct_class_python(bufnr, current_node)
-          break
+        node_chunk = struct.get_struct_class_python(bufnr, current_node)
+        break
       elseif filetype == "python" and current_node:type() == enum_node_name then
-          node_chunk = enum.get_enum_inheritance_python(bufnr, current_node)
-          break
+        node_chunk = enum.get_enum_inheritance_python(bufnr, current_node)
+        break
       --- XXX: Lua does not support enums
       elseif filetype == "lua" and current_node:type() == struct_node_name then
         node_chunk = struct.get_struct_table_lua(bufnr, current_node)
@@ -70,7 +70,9 @@ local function get_node_chunk(bufnr, filetype)
   end
 
   if not node_chunk then
-    vim.g.exemplum.logger:error("Failed to find a code chunk to refactor: probably your cursor is placed in the wrong scope?")
+    vim.g.exemplum.logger:error(
+      "Failed to find a code chunk to refactor: probably your cursor is placed in the wrong scope?"
+    )
     return {}
   end
 
@@ -88,9 +90,7 @@ local function try_refactor(bang)
   local node_range = get_node_chunk(code_bufnr, buf_filetype)
 
   -- Early return if there was an error during the chunk retrieval process
-  if #node_range == 0 then
-    return {}
-  end
+  if #node_range == 0 then return {} end
 
   local refactor_register = vim.fn.getreg("e")
 
@@ -109,7 +109,9 @@ local function try_refactor(bang)
   vim.api.nvim_buf_set_lines(ref_bufnr, 0, -1, false, vim.split(vim.fn.getreg("e"), "\n"))
 
   -- Avoid autocommands duplication
-  if #vim.api.nvim_get_autocmds({ group = "Exemplum", pattern = "exemplum_infer_refactor" }) < 1 then
+  if
+    #vim.api.nvim_get_autocmds({ group = "Exemplum", pattern = "exemplum_infer_refactor" }) < 1
+  then
     vim.api.nvim_create_autocmd({ "BufWriteCmd", "BufLeave" }, {
       group = "Exemplum",
       pattern = "exemplum_infer_refactor",
@@ -118,7 +120,14 @@ local function try_refactor(bang)
           -- Get the refactor buffer contents and replace the code in the original buffer if it is different from the original code
           local refactor_code = vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false)
           if table.concat(refactor_code, "\n") ~= refactor_register then
-            vim.api.nvim_buf_set_text(code_bufnr, node_range[1], node_range[2], node_range[3], node_range[4], refactor_code)
+            vim.api.nvim_buf_set_text(
+              code_bufnr,
+              node_range[1],
+              node_range[2],
+              node_range[3],
+              node_range[4],
+              refactor_code
+            )
           end
         end
 
@@ -126,10 +135,8 @@ local function try_refactor(bang)
         vim.api.nvim_set_option_value("modified", false, { buf = ctx.buf })
 
         -- Deletes the buffer
-        if vim.api.nvim_buf_is_loaded(ctx.buf) then
-          vim.cmd.bdelete(ctx.buf)
-        end
-      end
+        if vim.api.nvim_buf_is_loaded(ctx.buf) then vim.cmd.bdelete(ctx.buf) end
+      end,
     })
   end
 end

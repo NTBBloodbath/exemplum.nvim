@@ -9,13 +9,17 @@ local function set_up_command()
   vim.api.nvim_create_user_command("Exemplum", function(ctx)
     local fargs = ctx.fargs
     if #fargs > 1 then
-      vim.g.exemplum.logger:error("Too many arguments were passed: 1 argument was expected, " .. #fargs .. " were provided")
+      vim.g.exemplum.logger:error(
+        "Too many arguments were passed: 1 argument was expected, " .. #fargs .. " were provided"
+      )
     end
 
     if #fargs < 1 then
-      vim.notify_once("exemplum.nvim WARN: The inference method is under development and may be inaccurate at times."
-        .. " If you need precision in refactoring rather than quick editing, use arguments in the command invocation.",
-        vim.log.levels.WARN)
+      vim.notify_once(
+        "exemplum.nvim WARN: The inference method is under development and may be inaccurate at times."
+          .. " If you need precision in refactoring rather than quick editing, use arguments in the command invocation.",
+        vim.log.levels.WARN
+      )
       require("exemplum.components.infer").try_refactor(ctx.bang)
     else
       local code_type = fargs[1]
@@ -39,7 +43,7 @@ local function set_up_command()
           end
         end, valid_arguments)
       end
-    end
+    end,
   })
 end
 
