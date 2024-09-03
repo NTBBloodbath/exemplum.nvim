@@ -161,8 +161,6 @@ local function refactor_enum()
       end
     })
   end
-
-  return enum_range
 end
 
 return {

@@ -126,8 +126,6 @@ local function try_refactor()
       end
     })
   end
-
-  return node_range
 end
 
 return { try_refactor = try_refactor }

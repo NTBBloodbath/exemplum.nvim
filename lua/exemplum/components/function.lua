@@ -108,8 +108,6 @@ local function refactor_function()
       end
     })
   end
-
-  return function_range
 end
 
 return {

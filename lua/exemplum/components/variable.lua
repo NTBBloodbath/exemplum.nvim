@@ -108,8 +108,6 @@ local function refactor_variable()
       end
     })
   end
-
-  return variable_range
 end
 
 return {

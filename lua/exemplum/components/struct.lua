@@ -205,8 +205,6 @@ local function refactor_struct()
       end
     })
   end
-
-  return struct_range
 end
 
 return {
