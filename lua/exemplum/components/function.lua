@@ -6,6 +6,7 @@ local winbuf = require("exemplum.winbuf")
 ---
 --- This table is used to identify function nodes in different programming languages.
 local function_node_names = {
+  c = "function_definition",
   cpp = "function_definition",
   lua = "function_declaration",
   rust = "function_item",

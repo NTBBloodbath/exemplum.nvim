@@ -6,6 +6,7 @@ local winbuf = require("exemplum.winbuf")
 ---
 ---This table is used to identify struct nodes in different programming languages.
 local struct_node_names = {
+  c = "struct_specifier",
   cpp = "struct_specifier",
   lua = "assignment_statement", -- XXX: in Lua, a table counts as a dynamic struct (table_constructor)
   rust = "struct_item",

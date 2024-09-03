@@ -6,6 +6,7 @@ local winbuf = require("exemplum.winbuf")
 ---
 ---This table is used to identify enum nodes in different programming languages.
 local enum_node_names = {
+  c = "enum_specifier",
   cpp = "enum_specifier",
   rust = "enum_item",
   python = "class_definition", -- XXX: in Python, Enum is another Class that is inherited

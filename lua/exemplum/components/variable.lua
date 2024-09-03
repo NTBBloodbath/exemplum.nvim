@@ -6,6 +6,7 @@ local winbuf = require("exemplum.winbuf")
 ---
 --- This table is used to identify variable nodes in different programming languages.
 local variable_node_names = {
+  c = "declaration",
   cpp = "declaration",
   lua = "variable_declaration",
   rust = "let_declaration",
