@@ -80,7 +80,10 @@ command when loaded.
   tree-sitter node that is near to your cursor position. For example, to refactor a
   function place your cursor anywhere inside the function and run `:Exemplum function`.
 
-Currently available `code_type` arguments:
+In case you want to silence your LSP diagnostics in the refactoring buffer, you can invoke the
+command by adding a bang (`!`) at the end of it, e.g. `:Exemplum! function`.
+
+**Currently available `code_type` arguments**:
 - `function`
 - `variable`
 - `struct`
