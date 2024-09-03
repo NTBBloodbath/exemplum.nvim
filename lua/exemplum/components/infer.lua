@@ -1,6 +1,8 @@
 ---@mod exemplum.components.infer
 
 local winbuf = require("exemplum.winbuf")
+local enum = require("exemplum.components.enum")
+local struct = require("exemplum.components.struct")
 local function_nodes = require("exemplum.components.function").function_node_names
 local variable_nodes = require("exemplum.components.variable").variable_node_names
 
@@ -12,6 +14,8 @@ local variable_nodes = require("exemplum.components.variable").variable_node_nam
 ---@return table Variable start/end positions. It is empty if there was a problem.
 ---@see vim.treesitter.get_node_range
 local function get_node_chunk(bufnr, filetype)
+  local enum_node_name = enum.enum_node_names[filetype]
+  local struct_node_name = struct.struct_node_names[filetype]
   local function_node_name = function_nodes[filetype]
   local variable_node_name = variable_nodes[filetype]
 
@@ -33,14 +37,32 @@ local function get_node_chunk(bufnr, filetype)
       break
     end
 
+    -- Precedence order (in theory?):
+    -- - variable
+    -- - function
+    -- - struct
+    -- - enum
     ---@cast current_node -nil
-    if current_node:type() == variable_node_name then
+    if current_node:type() == variable_node_name or current_node:type() == function_node_name then
       node_chunk = vim.treesitter.get_node_text(current_node, bufnr)
       break
-    -- XXX: function has the lower precedence (in theory?)
-    elseif current_node:type() == function_node_name then
-      node_chunk = vim.treesitter.get_node_text(current_node, bufnr)
-      break
+    else
+      if filetype == "python" and current_node:type() == struct_node_name then
+          node_chunk = struct.get_struct_class_python(bufnr, current_node)
+          break
+      elseif filetype == "python" and current_node:type() == enum_node_name then
+          node_chunk = enum.get_enum_inheritance_python(bufnr, current_node)
+          break
+      --- XXX: Lua does not support enums
+      elseif filetype == "lua" and current_node:type() == struct_node_name then
+        node_chunk = struct.get_struct_table_lua(bufnr, current_node)
+        break
+      else
+        if current_node:type() == struct_node_name or current_node:type() == enum_node_name then
+          node_chunk = vim.treesitter.get_node_text(current_node, bufnr)
+          break
+        end
+      end
     end
 
     current_node = current_node:parent()
@@ -48,6 +70,7 @@ local function get_node_chunk(bufnr, filetype)
 
   if node_chunk then
     vim.fn.setreg("e", node_chunk)
+    ---@cast current_node -nil
     return { vim.treesitter.get_node_range(current_node) }
   end
 

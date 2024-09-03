@@ -12,7 +12,6 @@ local function set_up_command()
       vim.g.exemplum.logger:error("Too many arguments were passed: 1 argument was expected, " .. #fargs .. " were provided")
     end
 
-    -- TODO: infer node to refactor based on the current cursor position
     if #fargs < 1 then
       vim.notify_once("exemplum.nvim WARN: The inference method is under development and may be inaccurate at times."
         .. " If you need precision in refactoring rather than quick editing, use arguments in the command invocation.",
@@ -20,7 +19,7 @@ local function set_up_command()
       require("exemplum.components.infer").try_refactor()
     else
       local code_type = fargs[1]
-      if vim.iter({ "function", "variable" }):find(code_type) then
+      if vim.iter({ "function", "variable", "struct", "enum" }):find(code_type) then
         require("exemplum.components." .. code_type).refactor()
       else
         vim.g.exemplum.logger:error("Unknown code type to refactor: maybe not supported yet?")
@@ -30,7 +29,7 @@ local function set_up_command()
     desc = "Run exemplum.nvim",
     nargs = "?",
     complete = function(arg_lead, cmdline, _)
-      local valid_arguments = { "function", "variable" }
+      local valid_arguments = { "function", "variable", "struct", "enum" }
       if cmdline:match("^Exemplum*%s+%w*$") then
         return vim.tbl_filter(function(cmd)
           if cmd:find("^" .. arg_lead) then

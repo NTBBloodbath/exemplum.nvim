@@ -1,7 +1,7 @@
 # exemplum.nvim
 Seamlessly refactor code chunks within your projects while keeping an eye on the initial
 implementation. By providing an intuitive interface, it simplifies the process of modifying
-functions, variables, and other code elements without disrupting your workflow.
+functions, variables, structs, enums, and other code elements without disrupting your workflow.
 
 ![exemplum demo](https://github.com/user-attachments/assets/b6a2c395-a6ce-4a6b-9990-43ac4db05d0e)
 
@@ -80,6 +80,8 @@ command when loaded.
 Currently available `code_type` arguments:
 - `function`
 - `variable`
+- `struct`
+- `enum`
 
 After performing a refactoring you can either save the buffer so it will be closed and the changes
 will be applied or you can close the buffer using `:q` to close it without applying the changes.
@@ -94,7 +96,7 @@ will be applied or you can close the buffer using `:q` to close it without apply
 ### Supported languages
 
 - `C++`
-- `Lua`
+- `Lua` (does not support `enum`s)
 - `Rust`
 - `Python`
 
